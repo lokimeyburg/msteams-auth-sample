@@ -10,6 +10,13 @@ extensions:
   contentType: samples
   createdDate: 11/3/2017 12:53:17 PM
 ---
+# Authentication documentation
+
+* start app: `npm start`
+* start ngrok: `/ngrok http 3333 -host-header=localhost:3333 -subdomain="lokimeyburg"`
+
+
+
 # Official documentation
 
 More information for this sample - and for how to get started with Microsoft Teams development in general - is found in [Get started on the Microsoft Teams platform with Node.js and App Studio](https://docs.microsoft.com/en-us/microsoftteams/platform/get-started/get-started-nodejs-app-studio).

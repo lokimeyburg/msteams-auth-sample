@@ -30,5 +30,9 @@ module.exports.setup = function(app) {
     
     app.get('/second', function(req, res) {
         res.render('second');
-    });    
+    }); 
+    
+    app.get('/auth', function(req, res) {
+        res.render('auth');
+    }); 
 };
