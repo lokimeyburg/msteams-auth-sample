@@ -1,6 +1,6 @@
 {
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.3/MicrosoftTeams.schema.json",
-    "manifestVersion": "1.3",
+    "manifestVersion": "1.5",
     "version": "1.0.0",
     "id": "00000000-0000-0000-0000-000000000000",
     "packageName": "com.contoso.helloworld",
@@ -62,5 +62,9 @@
         }]
     }],
     "permissions": [],
-    "validDomains": []
+    "validDomains": [],
+    "webApplicationInfo": {
+        "id": "d08903ab-44bb-4fc2-beb1-4f16bccae7ae",
+        "resource": "api://lokimeyburg.ngrok.io/d08903ab-44bb-4fc2-beb1-4f16bccae7ae"
+    }
 }
