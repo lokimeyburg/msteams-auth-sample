@@ -48,8 +48,8 @@ module.exports.setup = function(app) {
         var oboPromise = new Promise((resolve, reject) => {
             const url = "https://login.microsoftonline.com/" + tid + "/oauth2/v2.0/token";
             const params = {
-              client_id: process.env.APPSETTING_AAD_ApplicationId,
-              client_secret: process.env.APPSETTING_AAD_ApplicationSecret,
+              client_id: "bdb71ee3-1c28-4edb-a758-fd6f8b60348c",
+              client_secret: "]DjvGB0f?R[Z4qSwn24uSfr?EKhGN_tv",
               grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
               assertion: token,
               requested_token_use: "on_behalf_of",
@@ -77,7 +77,7 @@ module.exports.setup = function(app) {
             });
         });
 
-        promise.then(function(result) {
+        oboPromise.then(function(result) {
             console.log(result); // "Stuff worked!"
             res.render(result);
         }, function(err) {
