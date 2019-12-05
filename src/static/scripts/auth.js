@@ -6,8 +6,12 @@
     function getAuthToken(){
         // Get auth token
         var authTokenRequest = {
-            successCallback: sendTokenToBackend(result),
-            failureCallback: function(error) { console.log("Failure: " + error); },
+            successCallback: (result) =>  {
+                sendTokenToBackend(result);
+            },
+            failureCallback: function(error) { 
+                printLog("Error getting token: " + error);
+            },
         };
 
         microsoftTeams.authentication.getAuthToken(authTokenRequest);
@@ -17,8 +21,7 @@
     // After we call getAuthToken, we need to send the token from that request to the backend to 
     // verify that we have the correct permissions (or do an on-behalf-of exchange to get a new token) 
     function sendTokenToBackend(result){
-        console.log(result)
-        printLog("Token received: [TOKEN]")
+        printLog("Token received: " + result)
         printLog("Sending token to backend for AAD on-behalf-of exchange")
         // POST result to backend
         var xhr = new XMLHttpRequest();
@@ -34,7 +37,7 @@
         };
         // send POST request
         xhr.send(JSON.stringify({
-            value: value
+            token: result
         }));
     }
 
@@ -44,6 +47,7 @@
         var logDiv = document.getElementById('logs');
         var p = document.createElement("p");
         logDiv.prepend(msg, p);
+        console.log("Auth: " + msg);
     }
 
     
