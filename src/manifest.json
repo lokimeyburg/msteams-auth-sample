@@ -1,0 +1,70 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.3/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.5",
+    "version": "1.0.0",
+    "id": "00000000-0000-0000-0000-000000000000",
+    "packageName": "com.contoso.helloworld",
+    "developer": {
+        "name": "Contoso",
+        "websiteUrl": "https://www.microsoft.com",
+        "privacyUrl": "https://www.microsoft.com/privacy",
+        "termsOfUseUrl": "https://www.microsoft.com/termsofuse"
+    },
+    "name": {
+        "short": "Auth Sample",
+        "full": "Auth sample app for Microsoft Teams"
+    },
+    "description": {
+        "short": "Auth sample for Microsoft Teams",
+        "full": "This sample app provides a very simple app for Microsoft Teams which illustrates how authentication should work across tabs, bots and extensions."
+    },
+    "icons": {
+        "outline": "outline.png",
+        "color": "color.png"
+    },
+    "accentColor": "#60A18E",
+    "staticTabs": [{
+        "entityId": "com.contoso.helloworld.hellotab",
+        "name": "Auth Tab",
+        "contentUrl": "https://lokimeyburg.ngrok.io/auth",
+        "scopes": [
+            "personal"
+        ]
+    }],
+    "configurableTabs": [{
+        "configurationUrl": "https://lokimeyburg.ngrok.io/configure",
+        "canUpdateConfiguration": true,
+        "scopes": [
+            "team"
+        ]
+    }],
+    "bots": [{
+        "botId": "00000000-0000-0000-0000-000000000000",
+        "needsChannelSelector": false,
+        "isNotificationOnly": false,
+        "scopes": [
+            "team",
+            "personal"
+        ]
+    }],
+    "composeExtensions": [{
+        "botId": "00000000-0000-0000-0000-000000000000",
+        "commands": [{
+            "id": "getRandomText",
+            "description": "Gets some random text and images that you can insert in messages for fun.",
+            "title": "Get some random text for fun",
+            "initialRun": true,
+            "parameters": [{
+                "name": "cardTitle",
+                "description": "Card title to use",
+                "title": "Card title"
+            }]
+        }]
+    }],
+    "permissions": [],
+    "validDomains": [],
+    "webApplicationInfo": {
+        "id": "d08903ab-44bb-4fc2-beb1-4f16bccae7ae",
+        "resource": "api://lokimeyburg.ngrok.io/d08903ab-44bb-4fc2-beb1-4f16bccae7ae"
+    }
+}
