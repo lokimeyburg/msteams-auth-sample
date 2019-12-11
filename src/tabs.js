@@ -1,4 +1,6 @@
 'use strict';
+const fetch = require("node-fetch");
+const querystring = require("querystring");
 
 module.exports.setup = function(app) {
     var path = require('path');
@@ -8,6 +10,8 @@ module.exports.setup = function(app) {
     app.use(express.static(path.join(__dirname, 'static')));
     app.set('view engine', 'pug');
     app.set('views', path.join(__dirname, 'views'));
+    // Use the JSON middleware
+    app.use(express.json());
     
     // Setup home page
     app.get('/', function(req, res) {
@@ -39,10 +43,8 @@ module.exports.setup = function(app) {
 
     // Token exchange
     app.post('/auth/token', function(req, res) {
-        console.log(req);
-
-        var tid = req.authInfo.tid
-        var token = req.token
+        var tid = req.body.tid
+        var token = req.body.token
         var scopes = ["https://graph.microsoft.com/User.Read"]
 
         var oboPromise = new Promise((resolve, reject) => {
@@ -66,8 +68,11 @@ module.exports.setup = function(app) {
             }).then(result => {
               if (result.status !== 200) {
                 result.json().then(json => {
+                  console.log("--------------------------------------");
+                  console.log(json);
+                  console.log("--------------------------------------");
                   // TODO: Check explicitly for invalid_grant or interaction_required
-                  reject(new ServerError(403, "ConsentRequired"));
+                  reject({"error":"ConsentRequired"});
                 });
               } else {
                 result.json().then(json => {
@@ -79,10 +84,10 @@ module.exports.setup = function(app) {
 
         oboPromise.then(function(result) {
             console.log(result); // "Stuff worked!"
-            res.render(result);
+            res.json(result);
         }, function(err) {
             console.log(err); // Error: "It broke"
-            res.render(err);
+            res.json(err);
         });
     });
 };
