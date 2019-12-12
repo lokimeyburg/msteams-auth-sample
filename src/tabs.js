@@ -1,4 +1,6 @@
 'use strict';
+const fetch = require("node-fetch");
+const querystring = require("querystring");
 
 module.exports.setup = function(app) {
     var path = require('path');
@@ -8,6 +10,8 @@ module.exports.setup = function(app) {
     app.use(express.static(path.join(__dirname, 'static')));
     app.set('view engine', 'pug');
     app.set('views', path.join(__dirname, 'views'));
+    // Use the JSON middleware
+    app.use(express.json());
     
     // Setup home page
     app.get('/', function(req, res) {
@@ -32,28 +36,39 @@ module.exports.setup = function(app) {
         res.render('second');
     }); 
     
-    // Auth ---------------------------
+    // ------------------
+    // Auth page
     app.get('/auth', function(req, res) {
         res.render('auth');
     }); 
 
-    // Token exchange
-    app.post('/auth/token', function(req, res) {
-        console.log(req);
+    // Silent auth dialog
+    app.get('/auth/silent-start', function(req, res) {
+        var clientId = "bdb71ee3-1c28-4edb-a758-fd6f8b60348c"
+        res.render('silent-start', { clientId: clientId });
+    });
 
-        var tid = req.authInfo.tid
-        var token = req.token
+    // Silent auth end page
+    app.get('/auth/silent-end', function(req, res) {
+        var clientId = "bdb71ee3-1c28-4edb-a758-fd6f8b60348c"
+        res.render('silent-start', { clientId: clientId });
+    }); 
+
+    // On-behalf-of token exchange
+    app.post('/auth/token', function(req, res) {
+        var tid = req.body.tid
+        var token = req.body.token
         var scopes = ["https://graph.microsoft.com/User.Read"]
 
         var oboPromise = new Promise((resolve, reject) => {
             const url = "https://login.microsoftonline.com/" + tid + "/oauth2/v2.0/token";
             const params = {
-              client_id: "bdb71ee3-1c28-4edb-a758-fd6f8b60348c",
-              client_secret: "]DjvGB0f?R[Z4qSwn24uSfr?EKhGN_tv",
-              grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-              assertion: token,
-              requested_token_use: "on_behalf_of",
-              scope: scopes.join(" ")
+                client_id: "bdb71ee3-1c28-4edb-a758-fd6f8b60348c",
+                client_secret: "]DjvGB0f?R[Z4qSwn24uSfr?EKhGN_tv",
+                grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+                assertion: token,
+                requested_token_use: "on_behalf_of",
+                scope: scopes.join(" ")
             };
         
             fetch(url, {
@@ -66,8 +81,11 @@ module.exports.setup = function(app) {
             }).then(result => {
               if (result.status !== 200) {
                 result.json().then(json => {
+                  console.log("--------------------------------------");
+                  console.log(json);
+                  console.log("--------------------------------------");
                   // TODO: Check explicitly for invalid_grant or interaction_required
-                  reject(new ServerError(403, "ConsentRequired"));
+                  reject({"error":"ConsentRequired"});
                 });
               } else {
                 result.json().then(json => {
@@ -79,10 +97,10 @@ module.exports.setup = function(app) {
 
         oboPromise.then(function(result) {
             console.log(result); // "Stuff worked!"
-            res.render(result);
+            res.json(result);
         }, function(err) {
             console.log(err); // Error: "It broke"
-            res.render(err);
+            res.json(err);
         });
     });
 };
