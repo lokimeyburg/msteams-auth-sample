@@ -19,8 +19,8 @@
         "full": "This sample app provides a very simple app for Microsoft Teams which illustrates how authentication should work across tabs, bots and extensions."
     },
     "icons": {
-        "outline": "outline.png",
-        "color": "color.png"
+        "outline": "contoso20x20.png",
+        "color": "contoso96x96.png"
     },
     "accentColor": "#60A18E",
     "staticTabs": [{
