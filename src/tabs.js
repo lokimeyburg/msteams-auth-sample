@@ -93,11 +93,11 @@ module.exports.setup = function(app) {
         });
 
         oboPromise.then(function(result) {
-            console.log(result); // "Stuff worked!"
             res.json(result);
         }, function(err) {
             console.log(err); // Error: "It broke"
             res.json(err);
         });
     });
+
 };

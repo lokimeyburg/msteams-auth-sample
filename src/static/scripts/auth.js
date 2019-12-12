@@ -57,7 +57,6 @@
     function initializeConsentButton(){
         var btn = document.getElementById("promptForConsentButton")
         btn.onclick = () => {
-
             microsoftTeams.authentication.authenticate({
                 url: window.location.origin + "/auth/silent-start",
                 width: 600,
@@ -66,9 +65,7 @@
                     let data = localStorage.getItem(result);
                     localStorage.removeItem(result);
                     printLog("Success! Additional permission granted. Result: " + data)
-
-                    let tokenResult = JSON.parse(data);
-                    // getUserProfile(result.accessToken);
+                    // let tokenResult = JSON.parse(data);
                 },
                 failureCallback: function (reason) {
                     printLog("Failure. Additional permission was not granted. Result: " + JSON.stringify(reason))
@@ -80,6 +77,7 @@
     }
 
     // ------------------------------------------------------------------------
+
     function printLog(msg) {
         var logDiv = document.getElementById('logs');
         var p = document.createElement("p");
@@ -92,15 +90,14 @@
         var error = data.error;
         // Error: enable the grantPermission button
         if (error != null) {
-            printLog("Enabling the 'Grant Consent' button");
+            printLog("Enabling the 'Grant Permission' button");
             document.getElementById("promptForConsentButton").disabled = false
+        // Success: server returned a valid acess token
+        } else {
+            printLog("Success! You have a valid token from your backend with extra permissions.");
         }
 
     }
-
-
-
-    
 
     // Start authentication
     printLog("Starting...");
