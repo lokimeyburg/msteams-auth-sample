@@ -63,7 +63,11 @@
                 width: 600,
                 height: 535,
                 successCallback: function (result) {
-                    printLog("Success! Additional permission granted. Result: " + JSON.stringify(result))
+                    let data = localStorage.getItem(result);
+                    localStorage.removeItem(result);
+                    printLog("Success! Additional permission granted. Result: " + data)
+
+                    let tokenResult = JSON.parse(data);
                     // getUserProfile(result.accessToken);
                 },
                 failureCallback: function (reason) {

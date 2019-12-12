@@ -51,7 +51,7 @@ module.exports.setup = function(app) {
     // Silent auth end page
     app.get('/auth/silent-end', function(req, res) {
         var clientId = "bdb71ee3-1c28-4edb-a758-fd6f8b60348c"
-        res.render('silent-start', { clientId: clientId });
+        res.render('silent-end', { clientId: clientId });
     }); 
 
     // On-behalf-of token exchange
@@ -81,11 +81,8 @@ module.exports.setup = function(app) {
             }).then(result => {
               if (result.status !== 200) {
                 result.json().then(json => {
-                  console.log("--------------------------------------");
-                  console.log(json);
-                  console.log("--------------------------------------");
                   // TODO: Check explicitly for invalid_grant or interaction_required
-                  reject({"error":"ConsentRequired"});
+                  reject({"error":json.error});
                 });
               } else {
                 result.json().then(json => {
