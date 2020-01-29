@@ -13,7 +13,8 @@ extensions:
 # Authentication documentation
 
 * start app: `npm start`
-* start ngrok: `/ngrok http 3333 -host-header=localhost:3333 -subdomain="lokimeyburg"`
+* start ngrok (mac): `/ngrok http 3333 -host-header=localhost:3333 -subdomain="lokimeyburg"`
+* start ngrok (win): `./ngrok http 3333 -host-header=localhost:3333 -subdomain="lokimeyburg"`
 
 
 

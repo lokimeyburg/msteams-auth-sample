@@ -43,15 +43,15 @@ module.exports.setup = function(app) {
     }); 
 
     // Silent auth dialog
-    app.get('/auth/silent-start', function(req, res) {
+    app.get('/auth/auth-start', function(req, res) {
         var clientId = "bdb71ee3-1c28-4edb-a758-fd6f8b60348c"
-        res.render('silent-start', { clientId: clientId });
+        res.render('auth-start', { clientId: clientId });
     });
 
     // Silent auth end page
-    app.get('/auth/silent-end', function(req, res) {
+    app.get('/auth/auth-end', function(req, res) {
         var clientId = "bdb71ee3-1c28-4edb-a758-fd6f8b60348c"
-        res.render('silent-end', { clientId: clientId });
+        res.render('auth-end', { clientId: clientId });
     }); 
 
     // On-behalf-of token exchange

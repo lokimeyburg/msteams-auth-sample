@@ -58,7 +58,7 @@
         var btn = document.getElementById("promptForConsentButton")
         btn.onclick = () => {
             microsoftTeams.authentication.authenticate({
-                url: window.location.origin + "/auth/silent-start",
+                url: window.location.origin + "/auth/auth-start",
                 width: 600,
                 height: 535,
                 successCallback: function (result) {
