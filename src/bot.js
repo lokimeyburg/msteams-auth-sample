@@ -11,7 +11,6 @@ module.exports.setup = function(app) {
         delete require.cache[require.resolve('config')];
         config = require('config');
     }
-
     // Create a connector to handle the conversations
     var connector = new teams.TeamsChatConnector({
         // It is a bad idea to store secrets in config files. We try to read the settings from
