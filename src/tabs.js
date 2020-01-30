@@ -1,6 +1,7 @@
 'use strict';
 const fetch = require("node-fetch");
 const querystring = require("querystring");
+var config = require('config');
 
 module.exports.setup = function(app) {
     var path = require('path');
