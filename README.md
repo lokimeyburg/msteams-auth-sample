@@ -13,6 +13,8 @@ extensions:
 
 # Authentication documentation
 
+This sample is built on top of the [Hello World Node.js sample](https://github.com/OfficeDev/msteams-samples-hello-world-nodejs) to show you how to implement Azure AD single sign-on support. In addition, this sample also shows you how to request additional Graph API permissions from the user (even though most apps will find the single sign-on flow sufficient to authenticate a user).
+
 ## Prerequisites
 
 1. Setup an [Ngrok](https://ngrok.com/) account. This will allow you to test locally.
@@ -66,6 +68,7 @@ extensions:
 2. Install in Teams
     * Open Teams and visit the app store. Depending on the version of Teams, you may see an "App Store" button in the bottom left of Teams or you can find the app store by visiting `Apps > More Apps` in the left-hand app rail.
     * Install the app by clicking on the `Upload a custom app` link in the bottom left-hand side of the app store.
+    * Upload the manifest zip file created in step #1
 
 ## Trying out the app
 
@@ -74,12 +77,45 @@ extensions:
     * First you will see a dialog in Teams letting you know you need to grant permission to use the app.
     * Then an AAD consent dialog will appear in a seperate window.
     * Once you've consented to the permissions, your app will have enough information to authenticate you. This should be enough for _most_ apps.
-    * The app will then try and access an API server-side for which you have not yet granted permission but fail in doing so. You will then see the "Grant further permission" button enabled. You can click this to trigger another consent dialog for the additional permissions.
+    * The app will then try and access an API server-side for which you have not yet granted permission but fail in doing so. You will then see the "Grant further permissions" button enabled. You can click this to trigger another consent dialog for the additional permissions.
     * Once you've granted all the permissions, you can revisit this tab and you will notice that you will automatically be logged in.
 
-## Additional reading
+# App structure
 
-More information for this sample - and for how to get started with Microsoft Teams development in general - is found in [Get started on the Microsoft Teams platform with Node.js and App Studio](https://docs.microsoft.com/en-us/microsoftteams/platform/get-started/get-started-nodejs-app-studio).
+## Routes
+
+Compared to the Hello World sample, this app has four additional routes:
+1. `/auth` renders the authenticaiton page. 
+    * This is the tab called `Auth Tab` in personal app inside Teams. The purpose of this page is primarily to execute the `auth.js` file that handles initiates the authentication flow.
+2. `/auth/token` does not render anything but instead is the server-side route for initiating the [on-behalf-of flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v1-oauth2-on-behalf-of-flow). 
+    * It takes the token it receives from the `/auth` page and attemps to exchange it for a new token that has elevated permissions to access the `profile` Graph API (which is usually used to retrieve the users profile photo).
+    * If it fails (because the user hasn't granted permission to access the `profile` API), it returns an error to the `/auth` page. This error is used to enable the "Grant further permissions" button which opens the `/auth/start` page in a seperate window.
+3. `/auth/start` and `/auth/end` routes are used if the user needs to grant further permissions. This experience happens in a seperate window. 
+    * The `/auth/start` page merely creates a valid AAD authorization endpoint and redirects to that AAD consent page.
+    * Once the user has consented to the permissions, AAD redirects the user back to `/auth/end`. This page is responsible for returning the results back to the `/auth` page by calling the `notifySuccess` API.
+    * This workflow is only neccessary if you want authorization to use additional Graph APIs. Most apps will find this flow unnesseccary if all they want to do is authenticate the user.
+    * This workflow is the same as our standard [web-based authentication flow](https://docs.microsoft.com/en-us/microsoftteams/platform/tabs/how-to/authentication/auth-tab-aad#navigate-to-the-authorization-page-from-your-popup-page) that we've always had in Teams before we had single sign-on support. It just so happens that it's a great way to request additional permissions from the user, so it's left in this sample as an illustration of what that flow looks like.
+
+## auth.js
+
+This Javascript file is served from the `/auth` page and handles most of the client-side authentication workflow. This file is broken into three main functions:
+
+1. getAuthToken
+    * This function asks Teams for an authentication token from AAD. 
+    * Teams will show a dialog to the user letting them know they need to consent to this app logging them in.
+    * Once the user has consented to the AAD dialog, this function sends the token to the backend.
+2. sendTokenToBackend
+    * Once the user has consented to this app logging them in (authentication), we would like to have access to further API permissions not intially granted in the consent flow (authorization).
+    * This function sends the token to the backend to exchange for elevated permissions using AAD's [on-behalf-of flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v1-oauth2-on-behalf-of-flow). In this case, it sends the token to the `/auth/token` route.
+3. initializeConsentButton
+    * If this is the first time the user is interacting with the app, chances are they haven't granted the app permission to access their avatar picture (ie: `Profile` Graph API). Therefor we need to enable the "Grant furhter permissions" button.
+    * When clicked, this button opens another dialog (`/auth/start`) to ask the user to grant further permissions.
+
+# Additional reading
+
+More information on the Hellow World sample - and for how to get started with Microsoft Teams development in general - is found in [Get started on the Microsoft Teams platform with Node.js and App Studio](https://docs.microsoft.com/en-us/microsoftteams/platform/get-started/get-started-nodejs-app-studio).
+
+For further information on Single Sign-On and how it works, visit our [Single Sign-On documentation](https://docs.microsoft.com/en-us/microsoftteams/platform/tabs/how-to/authentication/auth-aad-sso)
 
 # Contributing
 
