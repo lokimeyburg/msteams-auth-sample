@@ -1,5 +1,5 @@
 {
-    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.3/MicrosoftTeams.schema.json",
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.5/MicrosoftTeams.schema.json",
     "manifestVersion": "1.5",
     "version": "1.0.0",
     "id": "00000000-0000-0000-0000-000000000000",
@@ -16,7 +16,7 @@
     },
     "description": {
         "short": "Auth sample for Microsoft Teams",
-        "full": "This sample app provides a very simple app for Microsoft Teams which illustrates how authentication should work across tabs, bots and extensions."
+        "full": "This sample app provides a very simple app for Microsoft Teams which illustrates how single sign-on (SSO) should work for tabs."
     },
     "icons": {
         "outline": "contoso20x20.png",
@@ -26,20 +26,20 @@
     "staticTabs": [{
         "entityId": "com.contoso.helloworld.hellotab",
         "name": "Auth Tab",
-        "contentUrl": "https://lokimeyburg.ngrok.io/auth",
+        "contentUrl": "https://{ngrokSubdomain}.ngrok.io/auth",
         "scopes": [
             "personal"
         ]
     }],
     "configurableTabs": [{
-        "configurationUrl": "https://lokimeyburg.ngrok.io/configure",
+        "configurationUrl": "https://{ngrokSubdomain}.ngrok.io/configure",
         "canUpdateConfiguration": true,
         "scopes": [
             "team"
         ]
     }],
     "bots": [{
-        "botId": "bdb71ee3-1c28-4edb-a758-fd6f8b60348c",
+        "botId": "00000000-0000-0000-0000-000000000000",
         "needsChannelSelector": false,
         "isNotificationOnly": false,
         "scopes": [
@@ -48,7 +48,7 @@
         ]
     }],
     "composeExtensions": [{
-        "botId": "bdb71ee3-1c28-4edb-a758-fd6f8b60348c",
+        "botId": "00000000-0000-0000-0000-000000000000",
         "commands": [{
             "id": "getRandomText",
             "description": "Gets some random text and images that you can insert in messages for fun.",
@@ -64,7 +64,7 @@
     "permissions": [],
     "validDomains": [],
     "webApplicationInfo": {
-        "id": "bdb71ee3-1c28-4edb-a758-fd6f8b60348c",
-        "resource": "api://lokimeyburg.ngrok.io/bdb71ee3-1c28-4edb-a758-fd6f8b60348c"
+        "id": "00000000-0000-0000-0000-000000000000",
+        "resource": "api://{ngrokSubdomain}.ngrok.io/00000000-0000-0000-0000-000000000000"
     }
 }

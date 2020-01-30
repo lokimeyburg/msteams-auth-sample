@@ -4,8 +4,8 @@
         "appPassword": "yourBotAppPassword"
     },
     "tab": {
-        "appId": "bdb71ee3-1c28-4edb-a758-fd6f8b60348c",
-        "appPassword": "]DjvGB0f?R[Z4qSwn24uSfr?EKhGN_tv"
+        "appId": "00000000-0000-0000-0000-000000000000",
+        "appPassword": "yourAADClientSecret"
     },
     "storage": "memory"
 }
