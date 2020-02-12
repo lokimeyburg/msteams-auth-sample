@@ -43,13 +43,13 @@ module.exports.setup = function(app) {
         res.render('auth');
     }); 
 
-    // Silent auth dialog
+    // Auth dialog to ask for additional permissions, redirects to AAD page
     app.get('/auth/auth-start', function(req, res) {
         var clientId = config.get("tab.appId");
         res.render('auth-start', { clientId: clientId });
     });
 
-    // Silent auth end page
+    // End of the auth dialog flow, returns the results back to parent window
     app.get('/auth/auth-end', function(req, res) {
         var clientId = config.get("tab.appId");
         res.render('auth-end', { clientId: clientId });

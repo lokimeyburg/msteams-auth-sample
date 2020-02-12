@@ -4,16 +4,16 @@ products:
 - office-365
 languages:
 - javascript
-title: Microsoft Teams NodeJS Helloworld Tabs SSO Sample
-description: Microsoft Teams hello world sample app for tabs SSO in Node.js
+title: Microsoft Teams NodeJS Helloworld - Tabs Azure AD SSO Sample
+description: Microsoft Teams hello world sample app for tabs Azure AD SSO in Node.js
 extensions:
   contentType: samples
   createdDate: 11/3/2017 12:53:17 PM
 ---
 
-# Authentication documentation
+# Microsoft Teams - Tabs Azure AD Single Sign-On Sample
 
-This sample is built on top of the [Hello World Node.js sample](https://github.com/OfficeDev/msteams-samples-hello-world-nodejs) to show you how to implement Azure AD single sign-on support. In addition, this sample also shows you how to request additional Graph API permissions from the user (even though most apps will find the single sign-on flow sufficient to authenticate a user).
+This sample is built on top of the [Hello World Node.js sample](https://github.com/OfficeDev/msteams-samples-hello-world-nodejs) to show you how to implement Azure AD single sign-on support for tabs. In addition, this sample also shows you how to request additional Graph API permissions from the user (even though most apps will find the single sign-on flow sufficient to authenticate a user).
 
 ## Prerequisites
 
@@ -33,7 +33,7 @@ This sample is built on top of the [Hello World Node.js sample](https://github.c
     * Setup your API permissions. This is what your application is allowed to request permission to access.
         * Visit `Manage > API Permissions`
         * Make sure you have the following Graph permissions enabled: `email`, `offline_access`, `openid`, `User.Read` and `profile`.
-        * Our SSO flow will give you access to the first 4 permissions, and we will have to exchange the token server-side to get an elevated token for the `profile` permission.
+        * Our SSO flow will give you access to the first 4 permissions, and we will have to exchange the token server-side to get an elevated token for the `profile` permission (for example, if we want access to the user's profile photo).
     * Expose an API that will give the Teams desktop, web and mobile clients access to the permissions above
         * Visit `Manage > Expose an API`
         * Add a scope and give it a scope name of `access_as_user`. Your API url should look like this: `api://contoso.ngrok.io/{appID}/access_as_user`. In the "who can consent" step, enable it for "Admins and users". Make sure the state is set to "enabled".
