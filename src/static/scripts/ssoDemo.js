@@ -1,59 +1,10 @@
 (function () {
     'use strict';
 
-    // 1. Get auth token
-    // Ask Teams to get us a token from AAD, we should exchange it when it n
-    function getAuthToken() {
-        // Get auth token
-        var authTokenRequest = {
-            successCallback: (result) => {
-                sendTokenToBackend(result);
-            },
-            failureCallback: function (error) {
-                printLog("Error getting token: " + error);
-            },
-        };
-
-        microsoftTeams.authentication.getAuthToken(authTokenRequest);
-    }
-
-    // 2. Send token to the backend
-    // After we call getAuthToken, we need to send the token from that request to the backend to 
-    // verify that we have the correct permissions (or do an on-behalf-of exchange to get a new token) 
-    function sendTokenToBackend(result) {
-        printLog("Token received: " + result)
-        printLog("Sending token to backend for AAD on-behalf-of exchange")
-
-        // Get Tenant ID
-        var getContextPromise = new Promise((resolve, reject) => {
-            microsoftTeams.getContext(function (context) {
-                resolve(context);
-            });
-        });
-
-        // Send Tenant ID and token to backend
-        getContextPromise.then(function (context) {
-            // POST result to backend
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/auth/token", true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            // Set response handler before sending
-            xhr.onreadystatechange = function () {
-                if (this.readyState != 4) return;
-                if (this.status == 200) {
-                    var data = JSON.parse(this.responseText);
-                    handleServerResponse(data);
-                }
-            };
-            // send POST request
-            xhr.send(JSON.stringify({ "tid": context.tid, "token": result }));
-        });
-    }
-
-
-    // 3. Ask for additional consent from the user
-    // If the on-behalf-of-flow failed due to requiring further consent, then we need to have the
-    // user click a button to show the AAD consent dialog and ask for additional permission
+    // Set up button to get additional consent
+    // This button will be enabled if the on-behalf-of-flow fails
+    // due to requiring further consent. It shows the user an AAD
+    // consent dialog and asks for additional permission
     function initializeConsentButton() {
         var btn = document.getElementById("promptForConsentButton")
         btn.onclick = () => {
@@ -76,25 +27,69 @@
         }
     }
 
-    // ------------------------------------------------------------------------
+    // 1. Get auth token
+    // Ask Teams to get us a token from AAD
+    function step1_GetAuthToken() {
 
-    function printLog(msg) {
-        var logDiv = document.getElementById('logs');
-        var p = document.createElement("p");
-        logDiv.append(msg, p);
-        console.log("Auth: " + msg);
+        printLog("1. Getting auth token from Microsoft Teams");
+
+        // Get auth token
+        var authTokenRequest = {
+            successCallback: (result) => {
+                printLog(result)
+                step2_ExchangeForServerSideToken(result);
+            },
+            failureCallback: function (error) {
+                printLog("Error getting token: " + error);
+            },
+        };
+
+        microsoftTeams.authentication.getAuthToken(authTokenRequest);
     }
 
-    function handleServerResponse(data) {
-        printLog("Backend returned: " + data);
+    // 2. Exchange that token for a token with the required permissions
+    //    using the web service (see /auth/token handler in app.js)
+    function step2_ExchangeForServerSideToken(result) {
+        printLog("2. Exchanging for server-side token")
+
+        // Get Tenant ID
+        var getContextPromise = new Promise((resolve, reject) => {
+            microsoftTeams.getContext(function (context) {
+                resolve(context);
+            });
+        });
+
+        // Send Tenant ID and token to backend
+        getContextPromise.then(function (context) {
+            // POST result to backend
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/auth/token", true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            // Set response handler before sending
+            xhr.onreadystatechange = function () {
+                if (this.readyState != 4) return;
+                if (this.status == 200) {
+                    var data = JSON.parse(this.responseText);
+                    printLog(data);
+                    step3_UseServerSideToken(data);
+                }
+            };
+            // send POST request
+            xhr.send(JSON.stringify({ "tid": context.tid, "token": result }));
+        });
+    }
+
+    // 3. Get the server side token and use it to call the Graph API
+    function step3_UseServerSideToken(data) {
+
         var error = data.error;
-        // Error: enable the grantPermission button
         if (error != null) {
-            printLog("Enabling the 'Grant Permission' button");
-            document.getElementById("promptForConsentButton").disabled = false
-            // Success: server returned a valid acess token
+            // Error: enable the grantPermission button
+            printLog("Server needs user consent - enable the 'Grant Permission' button");
+            document.getElementById("promptForConsentButton").disabled = false;
         } else {
-            printLog("Success! You have a valid token from your backend with extra permissions.");
+            // Success: server returned a valid acess token
+            printLog("3. Calling Graph API");
             fetch("https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages",
                 {
                     method: 'GET',
@@ -115,18 +110,22 @@
                 .then((messages) => {
                     printLog(`Retrieved ${messages.value.length} messages:`);
                     for (const m of messages.value) {
-                        printLog(m.receivedDateTime + " --- " + m.subject);
+                        printLog(`${m.receivedDateTime} --- ${m.subject}`);
                     }
                 });
         }
 
     }
 
-    // Start authentication
-    printLog("Starting...");
-    printLog("Getting auth token...");
-    initializeConsentButton();
-    getAuthToken();
+    function printLog(msg) {
+        var logDiv = document.getElementById('logs');
+        var p = document.createElement("p");
+        logDiv.append(msg, p);
+        console.log("Auth: " + msg);
+    }
 
+    // In-line code
+    initializeConsentButton();
+    step1_GetAuthToken();
 
 })();
