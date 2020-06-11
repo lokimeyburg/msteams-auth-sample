@@ -11,6 +11,7 @@ module.exports.setup = function(app) {
     app.use(express.static(path.join(__dirname, 'static')));
     app.set('view engine', 'pug');
     app.set('views', path.join(__dirname, 'views'));
+    
     // Use the JSON middleware
     app.use(express.json());
     
