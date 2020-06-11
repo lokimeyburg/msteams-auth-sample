@@ -45,10 +45,9 @@ module.exports.setup = function(app) {
 
     // On-behalf-of token exchange
     app.post('/auth/token', function(req, res) {
-        var tid = req.body.tid
-        var token = req.body.token
-        var scopes = ["https://graph.microsoft.com/User.Read",
-                      "https://graph.microsoft.com/Mail.Read"]
+        var tid = req.body.tid;
+        var token = req.body.token;
+        var scopes = ["https://graph.microsoft.com/User.Read"];
 
         var oboPromise = new Promise((resolve, reject) => {
             const url = "https://login.microsoftonline.com/" + tid + "/oauth2/v2.0/token";

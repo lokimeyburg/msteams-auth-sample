@@ -31,7 +31,7 @@
     // Ask Teams to get us a token from AAD
     function step1_GetAuthToken() {
 
-        printLog("1. Getting auth token from Microsoft Teams");
+        printLog("1. Get auth token from Microsoft Teams");
 
         // Get auth token
         var authTokenRequest = {
@@ -50,7 +50,7 @@
     // 2. Exchange that token for a token with the required permissions
     //    using the web service (see /auth/token handler in app.js)
     function step2_ExchangeForServerSideToken(result) {
-        printLog("2. Exchanging for server-side token")
+        printLog("2. Exchange for server-side token")
 
         // Get Tenant ID
         var getContextPromise = new Promise((resolve, reject) => {
@@ -89,8 +89,8 @@
             document.getElementById("promptForConsentButton").disabled = false;
         } else {
             // Success: server returned a valid acess token
-            printLog("3. Calling Graph API");
-            fetch("https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages",
+            printLog("3. Use token to get user profile from Graph API");
+            fetch("https://graph.microsoft.com/v1.0/me/",
                 {
                     method: 'GET',
                     headers: {
@@ -107,21 +107,20 @@
                         throw (`Error ${response.status}: ${response.statusText}`);
                     }
                 })
-                .then((messages) => {
-                    printLog(`Retrieved ${messages.value.length} messages:`);
-                    for (const m of messages.value) {
-                        printLog(`${m.receivedDateTime} --- ${m.subject}`);
-                    }
+                .then((profile) => {
+                    printLog(JSON.stringify(profile, undefined, 4), 'pre');
                 });
         }
 
     }
 
-    function printLog(msg) {
+    // Add text to the display in a <p> or other HTML element
+    function printLog(text, elementTag) {
         var logDiv = document.getElementById('logs');
-        var p = document.createElement("p");
-        logDiv.append(msg, p);
-        console.log("Auth: " + msg);
+        var p = document.createElement(elementTag ? elementTag : "p");
+        p.innerText = text;
+        logDiv.append(p);
+        console.log("ssoDemo: " + text);
     }
 
     // In-line code
