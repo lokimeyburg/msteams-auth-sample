@@ -69,7 +69,7 @@ This sample is built on top of the [Hello World Node.js sample](https://github.c
 ## Packaging and installing your app to Teams
 
 1. Package your manifest 
-    * `gulp package-manifest`
+    * `gulp generate-manifest`
     * This will create a zip file in the manifest folder
 2. Install in Teams
     * Open Teams and visit the app store. Depending on the version of Teams, you may see an "App Store" button in the bottom left of Teams or you can find the app store by visiting `Apps > More Apps` in the left-hand app rail.
