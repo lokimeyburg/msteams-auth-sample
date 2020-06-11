@@ -1,5 +1,6 @@
 'use strict';
 
+var config = require('config');
 var express = require('express');
 var app = express();
 
@@ -16,7 +17,9 @@ tabs.setup(app);
 // messagingExtension.setup();
 
 // Deciding which port to use
-var port = process.env.PORT || 3333;
+var port = process.env.PORT ||
+           config.has("port") ? config.get("port") : 3333;
+//var port = process.env.PORT || 3333;
 
 // Start our nodejs app
 app.listen(port, function() {
