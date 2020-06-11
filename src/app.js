@@ -8,12 +8,12 @@ var tabs = require('./tabs');
 tabs.setup(app);
 
 // Adding a bot to our app
-var bot = require('./bot');
-bot.setup(app);
+// var bot = require('./bot');
+// bot.setup(app);
 
 // Adding a messaging extension to our app
-var messagingExtension = require('./messaging-extension');
-messagingExtension.setup();
+// var messagingExtension = require('./messaging-extension');
+// messagingExtension.setup();
 
 // Deciding which port to use
 var port = process.env.PORT || 3333;

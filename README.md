@@ -44,8 +44,14 @@ This sample is built on top of the [Hello World Node.js sample](https://github.c
 ## Configuring this app for local development
 
 1. Update your `manifest.json` file
+    * Generate a new unique ID for the application and replace the id field with this GUID. On Windows, you can generate a new GUID in PowerShell with this command:
+    ~~~ powershell
+     [guid]::NewGuid()
+    ~~~
+    * Ensure the package name is unique within the tenant where you will run the app
     * Replace `{ngrokSubdomain}` with the subdomain you've assigned to your Ngrok account in step #1 above.
     * Update your `webApplicationInfo` section with your Azure AD application ID that you were assigned in step #2 above.
+
 2. Update your `config/default.json` file
     * Replace the `tab.id` property with you Azure AD application ID
     * Replace the `tab.password` property with the "client secret" you were assigned in step #2

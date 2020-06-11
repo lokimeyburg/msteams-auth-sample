@@ -1,15 +1,15 @@
-(function() {
+(function () {
     'use strict';
 
     // 1. Get auth token
     // Ask Teams to get us a token from AAD, we should exchange it when it n
-    function getAuthToken(){
+    function getAuthToken() {
         // Get auth token
         var authTokenRequest = {
-            successCallback: (result) =>  {
+            successCallback: (result) => {
                 sendTokenToBackend(result);
             },
-            failureCallback: function(error) { 
+            failureCallback: function (error) {
                 printLog("Error getting token: " + error);
             },
         };
@@ -20,19 +20,19 @@
     // 2. Send token to the backend
     // After we call getAuthToken, we need to send the token from that request to the backend to 
     // verify that we have the correct permissions (or do an on-behalf-of exchange to get a new token) 
-    function sendTokenToBackend(result){
+    function sendTokenToBackend(result) {
         printLog("Token received: " + result)
         printLog("Sending token to backend for AAD on-behalf-of exchange")
 
         // Get Tenant ID
         var getContextPromise = new Promise((resolve, reject) => {
-            microsoftTeams.getContext(function(context){
+            microsoftTeams.getContext(function (context) {
                 resolve(context);
             });
         });
 
         // Send Tenant ID and token to backend
-        getContextPromise.then(function(context) {
+        getContextPromise.then(function (context) {
             // POST result to backend
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "/auth/token", true);
@@ -46,7 +46,7 @@
                 }
             };
             // send POST request
-            xhr.send(JSON.stringify({ "tid": context.tid, "token": result })); 
+            xhr.send(JSON.stringify({ "tid": context.tid, "token": result }));
         });
     }
 
@@ -54,7 +54,7 @@
     // 3. Ask for additional consent from the user
     // If the on-behalf-of-flow failed due to requiring further consent, then we need to have the
     // user click a button to show the AAD consent dialog and ask for additional permission
-    function initializeConsentButton(){
+    function initializeConsentButton() {
         var btn = document.getElementById("promptForConsentButton")
         btn.onclick = () => {
             microsoftTeams.authentication.authenticate({
@@ -72,7 +72,7 @@
                     // handleAuthError(reason);
                 }
             });
-            
+
         }
     }
 
@@ -81,20 +81,43 @@
     function printLog(msg) {
         var logDiv = document.getElementById('logs');
         var p = document.createElement("p");
-        logDiv.prepend(msg, p);
+        logDiv.append(msg, p);
         console.log("Auth: " + msg);
     }
 
     function handleServerResponse(data) {
-        printLog("Backend returned: " + JSON.stringify(data));
+        printLog("Backend returned: " + data);
         var error = data.error;
         // Error: enable the grantPermission button
         if (error != null) {
             printLog("Enabling the 'Grant Permission' button");
             document.getElementById("promptForConsentButton").disabled = false
-        // Success: server returned a valid acess token
+            // Success: server returned a valid acess token
         } else {
             printLog("Success! You have a valid token from your backend with extra permissions.");
+            fetch("https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages",
+                {
+                    method: 'GET',
+                    headers: {
+                        "accept": "application/json",
+                        "authorization": "bearer " + data
+                    },
+                    mode: 'cors',
+                    cache: 'default'
+                })
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw (`Error ${response.status}: ${response.statusText}`);
+                    }
+                })
+                .then((messages) => {
+                    printLog(`Retrieved ${messages.value.length} messages:`);
+                    for (const m of messages.value) {
+                        printLog(m.receivedDateTime + " --- " + m.subject);
+                    }
+                });
         }
 
     }
@@ -104,6 +127,6 @@
     printLog("Getting auth token...");
     initializeConsentButton();
     getAuthToken();
-    
+
 
 })();
