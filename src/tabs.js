@@ -20,37 +20,24 @@ module.exports.setup = function(app) {
         res.render('hello');
     });
     
-    // // Setup the static tab
-    // app.get('/hello', function(req, res) {
-    //     res.render('hello');
-    // });
-    
     // Setup the configure tab, with first and second as content tabs
     app.get('/configure', function(req, res) {
         res.render('configure');
     });    
 
-    // app.get('/first', function(req, res) {
-    //     res.render('first');
-    // });
-    
-    // app.get('/second', function(req, res) {
-    //     res.render('second');
-    // }); 
-    
     // ------------------
-    // Auth page
-    app.get('/auth', function(req, res) {
-        res.render('auth');
+    // SSO demo page
+    app.get('/ssodemo', function(req, res) {
+        res.render('ssoDemo');
     }); 
 
-    // Auth dialog to ask for additional permissions, redirects to AAD page
+    // Pop-up dialog to ask for additional permissions, redirects to AAD page
     app.get('/auth/auth-start', function(req, res) {
         var clientId = config.get("tab.appId");
         res.render('auth-start', { clientId: clientId });
     });
 
-    // End of the auth dialog flow, returns the results back to parent window
+    // End of the pop-up dialog auth flow, returns the results back to parent window
     app.get('/auth/auth-end', function(req, res) {
         var clientId = config.get("tab.appId");
         res.render('auth-end', { clientId: clientId });
