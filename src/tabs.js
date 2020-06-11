@@ -20,23 +20,23 @@ module.exports.setup = function(app) {
         res.render('hello');
     });
     
-    // Setup the static tab
-    app.get('/hello', function(req, res) {
-        res.render('hello');
-    });
+    // // Setup the static tab
+    // app.get('/hello', function(req, res) {
+    //     res.render('hello');
+    // });
     
     // Setup the configure tab, with first and second as content tabs
     app.get('/configure', function(req, res) {
         res.render('configure');
     });    
 
-    app.get('/first', function(req, res) {
-        res.render('first');
-    });
+    // app.get('/first', function(req, res) {
+    //     res.render('first');
+    // });
     
-    app.get('/second', function(req, res) {
-        res.render('second');
-    }); 
+    // app.get('/second', function(req, res) {
+    //     res.render('second');
+    // }); 
     
     // ------------------
     // Auth page
