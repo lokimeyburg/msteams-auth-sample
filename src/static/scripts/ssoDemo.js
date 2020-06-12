@@ -3,7 +3,7 @@
 
     // 1. Get auth token
     // Ask Teams to get us a token from AAD
-    function GetClientSideToken() {
+    function getClientSideToken() {
 
         return new Promise((resolve, reject) => {
 
@@ -25,7 +25,7 @@
 
     // 2. Exchange that token for a token with the required permissions
     //    using the web service (see /auth/token handler in app.js)
-    function GetServerSideToken(clientSideToken) {
+    function getServerSideToken(clientSideToken) {
 
         display("2. Exchange for server-side token");
 
@@ -66,7 +66,7 @@
     }
 
     // 3. Get the server side token and use it to call the Graph API
-    function UseServerSideToken(data) {
+    function useServerSideToken(data) {
 
         display("3. Call https://graph.microsoft.com/v1.0/me/ with the server side token");
 
@@ -123,12 +123,12 @@
     }
 
     // In-line code
-    GetClientSideToken()
+    getClientSideToken()
         .then((clientSideToken) => {
-            return GetServerSideToken(clientSideToken);
+            return getServerSideToken(clientSideToken);
         })
         .then((serverSideToken) => {
-            return UseServerSideToken(serverSideToken);
+            return useServerSideToken(serverSideToken);
         })
         .catch((error) => {
             if (error === "invalid_grant") {
@@ -141,7 +141,7 @@
                             // Consent succeeded - use the token we got back
                             let accessToken = JSON.parse(result).accessToken;
                             display(`Received access token ${accessToken}`);
-                            UseServerSideToken(accessToken);
+                            useServerSideToken(accessToken);
                         })
                         .catch((error) => {
                             display(`ERROR ${error}`);
