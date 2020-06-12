@@ -2,8 +2,6 @@ extends layout.pug
 
 block content
   div(class="font-semibold font-title") Azure AD SSO Tab Demo
-  p 
-    button(id="promptForConsentButton" class="button-primary" disabled) Grant further permissions
-  div(id="logs" style="overflow-y: scroll;")
+  div(id="logs" style="overflow-x: hidden; overflow-y: scroll;")
   script(src="/scripts/initTeamsTab.js")
   script(src="/scripts/ssoDemo.js")
