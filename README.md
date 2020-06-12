@@ -93,7 +93,8 @@ Leave this running while you're running the application locally, and open anothe
 2. Install the neccessary NPM packages and start the app
     * `npm install`
     * `npm start`
-    * Your app should be running on port 3333
+
+Thhe app should start running on port 3333 or the port you configured
 
 ## Packaging and installing your app to Teams
 
