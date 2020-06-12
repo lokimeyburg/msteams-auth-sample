@@ -30,72 +30,40 @@
     // Ask Teams to get us a token from AAD
     function step1_GetAuthToken() {
 
-        printLog("1. Get auth token from Microsoft Teams");
+        return new Promise((resolve, reject) => {
 
-        // Get auth token
-        var authTokenRequest = {
-            successCallback: (result) => {
-                printLog(result)
-                step2_ExchangeForServerSideToken(result);
-            },
-            failureCallback: function (error) {
-                printLog("Error getting token: " + error);
-            },
-        };
+            printLog("1. Get auth token from Microsoft Teams");
 
-        microsoftTeams.authentication.getAuthToken(authTokenRequest);
+            microsoftTeams.authentication.getAuthToken({
+                successCallback: (result) => {
+                    printLog(result)
+                    resolve(result);
+                },
+                failureCallback: function (error) {
+                    reject("Error getting token: " + error);
+                }
+            });
+
+        });
+
     }
 
     // 2. Exchange that token for a token with the required permissions
     //    using the web service (see /auth/token handler in app.js)
-    function step2_ExchangeForServerSideToken(result) {
-        printLog("2. Exchange for server-side token")
+    function step2_ExchangeForServerSideToken(clientSideToken) {
 
-        // Get Tenant ID
-        var getContextPromise = new Promise((resolve, reject) => {
-            microsoftTeams.getContext(function (context) {
-                resolve(context);
-            });
-        });
+        printLog("2. Exchange for server-side token");
 
-        // Send Tenant ID and token to backend
-        getContextPromise.then(function (context) {
-            // POST result to backend
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/auth/token", true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            // Set response handler before sending
-            xhr.onreadystatechange = function () {
-                if (this.readyState != 4) return;
-                if (this.status == 200) {
-                    var data = JSON.parse(this.responseText);
-                    printLog(data);
-                    step3_UseServerSideToken(data);
-                }
-            };
-            // send POST request
-            xhr.send(JSON.stringify({ "tid": context.tid, "token": result }));
-        });
-    }
+        return new Promise((resolve, reject) => {
 
-    // 3. Get the server side token and use it to call the Graph API
-    function step3_UseServerSideToken(data) {
+            microsoftTeams.getContext((context) => {
 
-        var error = data.error;
-        if (error != null) {
-            // Error: enable the grantPermission button
-            printLog("Server needs user consent - enable the 'Grant Permission' button");
-            document.getElementById("promptForConsentButton").disabled = false;
-        } else {
-            // Success: server returned a valid acess token
-            printLog("3. Use token to get user profile from Graph API");
-            fetch("https://graph.microsoft.com/v1.0/me/",
-                {
-                    method: 'GET',
+                fetch('/auth/token', {
+                    method: 'post',
                     headers: {
-                        "accept": "application/json",
-                        "authorization": "bearer " + data
+                        'Content-Type': 'application/json'
                     },
+                    body: JSON.stringify({ "tid": context.tid, "token": clientSideToken }),
                     mode: 'cors',
                     cache: 'default'
                 })
@@ -103,13 +71,45 @@
                     if (response.ok) {
                         return response.json();
                     } else {
-                        throw (`Error ${response.status}: ${response.statusText}`);
+                        reject(response.error);
                     }
                 })
-                .then((profile) => {
-                    printLog(JSON.stringify(profile, undefined, 4), 'pre');
+                .then((responseJson) => {
+                    if (responseJson.error) {
+                        reject(responseJson.error);
+                    } else {
+                        const serverSideToken = responseJson;
+                        printLog(serverSideToken);
+                        resolve(serverSideToken);
+                    }
                 });
-        }
+            });
+        });
+    }
+
+    // 3. Get the server side token and use it to call the Graph API
+    function step3_UseServerSideToken(data) {
+
+        return fetch("https://graph.microsoft.com/v1.0/me/",
+            {
+                method: 'GET',
+                headers: {
+                    "accept": "application/json",
+                    "authorization": "bearer " + data
+                },
+                mode: 'cors',
+                cache: 'default'
+            })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw (`Error ${response.status}: ${response.statusText}`);
+                }
+            })
+            .then((profile) => {
+                printLog(JSON.stringify(profile, undefined, 4), 'pre');
+            });
 
     }
 
@@ -124,6 +124,20 @@
 
     // In-line code
     initializeConsentButton();
-    step1_GetAuthToken();
+    step1_GetAuthToken()
+        .then((clientSideToken) => {
+            return step2_ExchangeForServerSideToken(clientSideToken);
+        })
+        .then((serverSideToken) => {
+            return step3_UseServerSideToken(serverSideToken);
+        })
+        .catch((error) => {
+            if (error === "invalid_grant") {
+                printLog("Server needs user consent - enable the 'Grant Permission' button");
+                document.getElementById("promptForConsentButton").disabled = false;
+            } else {
+                printLog(`Error from web service: ${error}`);
+            }
+        });
 
 })();
