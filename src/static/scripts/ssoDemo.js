@@ -1,48 +1,6 @@
 (function () {
     'use strict';
 
-    // Set up button to get additional consent
-    // This button will be enabled if the on-behalf-of-flow fails
-    // due to requiring further consent. It shows the user an AAD
-    // consent dialog and asks for additional permission
-    // function initializeConsentButton() {
-    //     var btn = document.getElementById("promptForConsentButton")
-    //     btn.onclick = () => {
-    //         microsoftTeams.authentication.authenticate({
-    //             url: window.location.origin + "/auth/auth-start",
-    //             width: 600,
-    //             height: 535,
-    //             successCallback: function (result) {
-    //                 let data = localStorage.getItem(result);
-    //                 localStorage.removeItem(result);
-    //                 printLog("Success! Additional permission granted. Result: " + data)
-    //                 window.location.reload();
-    //             },
-    //             failureCallback: function (reason) {
-    //                 printLog("Failure. Additional permission was not granted. Result: " + JSON.stringify(reason))
-    //             }
-    //         });
-    //     }
-    // }
-
-    function requestConsent() {
-        return new Promise((resolve, reject) => {
-            microsoftTeams.authentication.authenticate({
-                url: window.location.origin + "/auth/auth-start",
-                width: 600,
-                height: 535,
-                successCallback: (result) => {
-                    let data = localStorage.getItem(result);
-                    localStorage.removeItem(result);
-                    resolve(data);
-                },
-                failureCallback: (reason) => {
-                    reject(JSON.stringify(reason));
-                }
-            });
-        });
-    }
-
     // 1. Get auth token
     // Ask Teams to get us a token from AAD
     function GetClientSideToken() {
@@ -87,22 +45,22 @@
                     mode: 'cors',
                     cache: 'default'
                 })
-                    .then((response) => {
-                        if (response.ok) {
-                            return response.json();
-                        } else {
-                            reject(response.error);
-                        }
-                    })
-                    .then((responseJson) => {
-                        if (responseJson.error) {
-                            reject(responseJson.error);
-                        } else {
-                            const serverSideToken = responseJson;
-                            display(serverSideToken);
-                            resolve(serverSideToken);
-                        }
-                    });
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        reject(response.error);
+                    }
+                })
+                .then((responseJson) => {
+                    if (responseJson.error) {
+                        reject(responseJson.error);
+                    } else {
+                        const serverSideToken = responseJson;
+                        display(serverSideToken);
+                        resolve(serverSideToken);
+                    }
+                });
             });
         });
     }
@@ -135,6 +93,25 @@
 
     }
 
+    // Show the consent pop-up
+    function requestConsent() {
+        return new Promise((resolve, reject) => {
+            microsoftTeams.authentication.authenticate({
+                url: window.location.origin + "/auth/auth-start",
+                width: 600,
+                height: 535,
+                successCallback: (result) => {
+                    let data = localStorage.getItem(result);
+                    localStorage.removeItem(result);
+                    resolve(data);
+                },
+                failureCallback: (reason) => {
+                    reject(JSON.stringify(reason));
+                }
+            });
+        });
+    }
+
     // Add text to the display in a <p> or other HTML element
     function display(text, elementTag) {
         var logDiv = document.getElementById('logs');
@@ -156,22 +133,26 @@
         .catch((error) => {
             if (error === "invalid_grant") {
                 display(`Error: ${error} - user or admin consent required`);
+                // Display in-line button so user can consent
                 let button = display("Consent", "button");
                 button.onclick = (() => {
                     requestConsent()
                         .then((result) => {
+                            // Consent succeeded - use the token we got back
                             let accessToken = JSON.parse(result).accessToken;
                             display(`Received access token ${accessToken}`);
                             UseServerSideToken(accessToken);
                         })
                         .catch((error) => {
                             display(`ERROR ${error}`);
+                            // Consent failed - offer to refresh the page
                             button.disabled = true;
                             let refreshButton = display("Refresh page", "button");
                             refreshButton.onclick = (() => { window.location.reload(); });
                         });
                 });
             } else {
+                // Something else went wrong
                 display(`Error from web service: ${error}`);
             }
         });
