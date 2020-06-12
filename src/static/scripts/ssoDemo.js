@@ -16,11 +16,10 @@
                     let data = localStorage.getItem(result);
                     localStorage.removeItem(result);
                     printLog("Success! Additional permission granted. Result: " + data)
-                    // let tokenResult = JSON.parse(data);
+                    window.location.reload();
                 },
                 failureCallback: function (reason) {
                     printLog("Failure. Additional permission was not granted. Result: " + JSON.stringify(reason))
-                    // handleAuthError(reason);
                 }
             });
 
