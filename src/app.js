@@ -1,24 +1,18 @@
 'use strict';
 
+var config = require('config');
 var express = require('express');
 var app = express();
 
-// Adding tabs to our app. This will setup routes to various views
+// Add the route for handling tabs
 var tabs = require('./tabs');
 tabs.setup(app);
 
-// Adding a bot to our app
-var bot = require('./bot');
-bot.setup(app);
+// Decide which port to use
+var port = process.env.PORT ||
+           config.has("port") ? config.get("port") : 3333;
 
-// Adding a messaging extension to our app
-var messagingExtension = require('./messaging-extension');
-messagingExtension.setup();
-
-// Deciding which port to use
-var port = process.env.PORT || 3333;
-
-// Start our nodejs app
+// Listen for incoming requests
 app.listen(port, function() {
     console.log(`App started listening on port ${port}`);
 });

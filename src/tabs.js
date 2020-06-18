@@ -11,6 +11,7 @@ module.exports.setup = function(app) {
     app.use(express.static(path.join(__dirname, 'static')));
     app.set('view engine', 'pug');
     app.set('views', path.join(__dirname, 'views'));
+    
     // Use the JSON middleware
     app.use(express.json());
     
@@ -19,37 +20,24 @@ module.exports.setup = function(app) {
         res.render('hello');
     });
     
-    // Setup the static tab
-    app.get('/hello', function(req, res) {
-        res.render('hello');
-    });
-    
     // Setup the configure tab, with first and second as content tabs
     app.get('/configure', function(req, res) {
         res.render('configure');
     });    
 
-    app.get('/first', function(req, res) {
-        res.render('first');
-    });
-    
-    app.get('/second', function(req, res) {
-        res.render('second');
-    }); 
-    
     // ------------------
-    // Auth page
-    app.get('/auth', function(req, res) {
-        res.render('auth');
+    // SSO demo page
+    app.get('/ssodemo', function(req, res) {
+        res.render('ssoDemo');
     }); 
 
-    // Auth dialog to ask for additional permissions, redirects to AAD page
+    // Pop-up dialog to ask for additional permissions, redirects to AAD page
     app.get('/auth/auth-start', function(req, res) {
         var clientId = config.get("tab.appId");
         res.render('auth-start', { clientId: clientId });
     });
 
-    // End of the auth dialog flow, returns the results back to parent window
+    // End of the pop-up dialog auth flow, returns the results back to parent window
     app.get('/auth/auth-end', function(req, res) {
         var clientId = config.get("tab.appId");
         res.render('auth-end', { clientId: clientId });
@@ -57,9 +45,9 @@ module.exports.setup = function(app) {
 
     // On-behalf-of token exchange
     app.post('/auth/token', function(req, res) {
-        var tid = req.body.tid
-        var token = req.body.token
-        var scopes = ["https://graph.microsoft.com/User.Read"]
+        var tid = req.body.tid;
+        var token = req.body.token;
+        var scopes = ["https://graph.microsoft.com/User.Read"];
 
         var oboPromise = new Promise((resolve, reject) => {
             const url = "https://login.microsoftonline.com/" + tid + "/oauth2/v2.0/token";
