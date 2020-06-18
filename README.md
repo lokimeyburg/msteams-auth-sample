@@ -43,7 +43,8 @@ Your tab needs to run as a registered Azure AD application in order to obtain an
 1. Create an [AAD application](https://docs.microsoft.com/en-us/microsoftteams/platform/tabs/how-to/authentication/auth-aad-sso#1-create-your-aad-application-in-azure) in Azure. You can do this by visiting the "Azure AD app registration" portal in Azure.
 
     * Set your application URI to the same URI you've created in Ngrok. 
-        * Ex: `api://contoso.ngrok.io`
+        * Ex: `api://contoso.ngrok.io/{appId}`
+        using the application ID that was assigned to your app
     * Setup your redirect URIs. This will allow Azure AD to return authentication results to the correct URI.
         * Visit `Manage > Authentication`. 
         * Create a redirect URI in the format of: `https://contoso.ngrok.io/auth/auth-end`.
